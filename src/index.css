@@ -1,0 +1,32 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/*
+RESET VITE DEFAULTS
+This removes the 1280px max-width and the black background
+causing the black bars on the sides of your screen.
+*/
+:root {
+font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+}
+
+body, html, #root {
+margin: 0;
+padding: 0;
+width: 100%;
+min-height: 100vh;
+background-color: #F5F7FA;
+}
+
+/* Custom Scrollbar for a polished look */
+.custom-scrollbar::-webkit-scrollbar {
+width: 6px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+background: transparent;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+background-color: #cbd5e1;
+border-radius: 20px;
+}
