@@ -41,7 +41,7 @@ const SURVEY_CONFIG = {
       options: [
         "Yes, it was easy to see. (Sayon ra makita)",
         "Yes, somewhat easy to see. (Medjo sayon ra makita)",
-        "No, it is difficult to see. (Liso makita)",
+        "No, it is difficult to see. (Lisod makita)",
         "No, it is not visible at all. (Wala gyud makita)",
         "Not Applicable (N/A). (Dili angay)"
       ]
@@ -347,19 +347,20 @@ export default function App() {
 
           {step === 2 && (
             <div className="animate-in fade-in slide-in-from-right-8 duration-300">
-               <div className="p-6 md:p-8 space-y-6">
+               <div className="p-6 md:p-8 space-y-5">
                 <div className="flex items-center gap-3 border-b border-[#E5E7EB] pb-4 mb-2">
                   <User className="w-6 h-6 text-[#FF9501]" />
                   <h3 className="text-lg font-bold text-[#1F2937]">Part III: Client Information</h3>
                 </div>
-                
-                <div className={`p-4 rounded-xl transition-colors ${isInvalid('client_type') ? 'bg-red-50/50 -mx-4 px-4' : ''}`}>
-                  <label className={`block font-bold mb-2 text-sm ${isInvalid('client_type') ? 'text-red-600' : 'text-[#374151]'}`}>Client Type <span className="text-red-500">*</span></label>
+
+                {/* Client Type */}
+                <div className={`p-5 rounded-xl border transition-colors duration-300 ${isInvalid('client_type') ? 'bg-red-50/50 border-red-200' : 'bg-[#F9FAFB] border-[#E5E7EB]'}`}>
+                  <label className={`block font-bold mb-3 text-sm ${isInvalid('client_type') ? 'text-red-600' : 'text-[#374151]'}`}>Client Type <span className="text-red-500">*</span></label>
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                     {["Citizen/Individual", "Business", "Government employee"].map(opt => (
                       <button 
                         key={opt} onClick={() => handleInputChange('client_type', opt)}
-                        className={`p-3 rounded-lg border text-sm font-medium transition-all text-center ${formData.client_type === opt ? 'border-[#FF9501] bg-[#FFF4E5] text-[#D97E00] ring-1 ring-[#FF9501]' : isInvalid('client_type') ? 'border-red-300 bg-white text-red-600' : 'border-[#E5E7EB] bg-[#F9FAFB] text-[#4B5563] hover:bg-gray-100'}`}
+                        className={`p-3 rounded-lg border text-sm font-medium transition-all text-center ${formData.client_type === opt ? 'border-[#FF9501] bg-white text-[#D97E00] ring-1 ring-[#FF9501] shadow-sm' : isInvalid('client_type') ? 'border-red-300 bg-white text-red-600' : 'border-[#E5E7EB] bg-white text-[#4B5563] hover:border-gray-300'}`}
                       >
                         {opt}
                       </button>
@@ -367,26 +368,28 @@ export default function App() {
                   </div>
                 </div>
 
+                {/* Date of Service + Age */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                  <div>
+                  <div className={`p-5 rounded-xl border transition-colors duration-300 ${isInvalid('date_of_service') ? 'bg-red-50/50 border-red-200' : 'bg-[#F9FAFB] border-[#E5E7EB]'}`}>
                     <label className={`block font-bold mb-2 text-sm ${isInvalid('date_of_service') ? 'text-red-600' : 'text-[#374151]'}`}>Date of Service <span className="text-red-500">*</span></label>
                     <input type="date" value={formData.date_of_service} onChange={(e) => handleInputChange('date_of_service', e.target.value)} 
-                           className={`w-full px-4 py-2.5 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#FF9501] transition-colors ${isInvalid('date_of_service') ? 'border border-red-400 bg-red-50 focus:border-[#FF9501]' : 'border border-[#E5E7EB] bg-[#F9FAFB]'}`} />
+                           className={`w-full px-4 py-2.5 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#FF9501] transition-colors ${isInvalid('date_of_service') ? 'border border-red-400 bg-red-50 focus:border-[#FF9501]' : 'border border-[#E5E7EB] bg-white'}`} />
                   </div>
-                  <div>
+                  <div className={`p-5 rounded-xl border transition-colors duration-300 ${isInvalid('age') ? 'bg-red-50/50 border-red-200' : 'bg-[#F9FAFB] border-[#E5E7EB]'}`}>
                     <label className={`block font-bold mb-2 text-sm ${isInvalid('age') ? 'text-red-600' : 'text-[#374151]'}`}>Age <span className="text-red-500">*</span></label>
                     <input type="number" placeholder="Enter age" value={formData.age} onChange={(e) => handleInputChange('age', e.target.value)} 
-                           className={`w-full px-4 py-2.5 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#FF9501] transition-colors ${isInvalid('age') ? 'border border-red-400 bg-red-50 focus:border-[#FF9501]' : 'border border-[#E5E7EB] bg-[#F9FAFB]'}`} />
+                           className={`w-full px-4 py-2.5 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#FF9501] transition-colors ${isInvalid('age') ? 'border border-red-400 bg-red-50 focus:border-[#FF9501]' : 'border border-[#E5E7EB] bg-white'}`} />
                   </div>
                 </div>
 
-                <div className={`p-4 rounded-xl transition-colors ${isInvalid('gender') ? 'bg-red-50/50 -mx-4 px-4' : ''}`}>
-                  <label className={`block font-bold mb-2 text-sm ${isInvalid('gender') ? 'text-red-600' : 'text-[#374151]'}`}>Gender <span className="text-red-500">*</span></label>
+                {/* Gender */}
+                <div className={`p-5 rounded-xl border transition-colors duration-300 ${isInvalid('gender') ? 'bg-red-50/50 border-red-200' : 'bg-[#F9FAFB] border-[#E5E7EB]'}`}>
+                  <label className={`block font-bold mb-3 text-sm ${isInvalid('gender') ? 'text-red-600' : 'text-[#374151]'}`}>Gender <span className="text-red-500">*</span></label>
                   <div className="flex flex-wrap gap-3">
                     {["Woman", "Man", "Non-binary", "Prefer not to say"].map(opt => (
                       <button 
                         key={opt} onClick={() => handleInputChange('gender', opt)}
-                        className={`px-4 py-2 rounded-full border text-sm font-medium transition-all ${formData.gender === opt ? 'border-[#FF9501] bg-[#FFF4E5] text-[#D97E00]' : isInvalid('gender') ? 'border-red-300 bg-white text-red-600' : 'border-[#E5E7EB] bg-white text-[#4B5563] hover:bg-gray-50'}`}
+                        className={`px-4 py-2 rounded-full border text-sm font-medium transition-all ${formData.gender === opt ? 'border-[#FF9501] bg-white text-[#D97E00] ring-1 ring-[#FF9501]' : isInvalid('gender') ? 'border-red-300 bg-white text-red-600' : 'border-[#E5E7EB] bg-white text-[#4B5563] hover:border-gray-300'}`}
                       >
                         {opt}
                       </button>
@@ -394,19 +397,20 @@ export default function App() {
                   </div>
                 </div>
 
+                {/* Region + Service Availed */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                  <div>
+                  <div className={`p-5 rounded-xl border transition-colors duration-300 ${isInvalid('region') ? 'bg-red-50/50 border-red-200' : 'bg-[#F9FAFB] border-[#E5E7EB]'}`}>
                     <label className={`block font-bold mb-2 text-sm ${isInvalid('region') ? 'text-red-600' : 'text-[#374151]'}`}>Region <span className="text-red-500">*</span></label>
                     <select value={formData.region} onChange={(e) => handleInputChange('region', e.target.value)} 
-                            className={`w-full px-4 py-2.5 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#FF9501] transition-colors cursor-pointer ${isInvalid('region') ? 'border border-red-400 bg-red-50 text-red-700' : 'border border-[#E5E7EB] bg-[#F9FAFB]'}`}>
+                            className={`w-full px-4 py-2.5 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#FF9501] transition-colors cursor-pointer ${isInvalid('region') ? 'border border-red-400 bg-red-50 text-red-700' : 'border border-[#E5E7EB] bg-white'}`}>
                       <option value="" disabled>Select Region...</option>
                       {SURVEY_CONFIG.regions.map(r => <option key={r} value={r}>{r}</option>)}
                     </select>
                   </div>
-                  <div>
+                  <div className={`p-5 rounded-xl border transition-colors duration-300 ${isInvalid('service_availed') || isInvalid('service_other') ? 'bg-red-50/50 border-red-200' : 'bg-[#F9FAFB] border-[#E5E7EB]'}`}>
                     <label className={`block font-bold mb-2 text-sm ${isInvalid('service_availed') || isInvalid('service_other') ? 'text-red-600' : 'text-[#374151]'}`}>Service Availed <span className="text-red-500">*</span></label>
                     <select value={formData.service_availed} onChange={(e) => handleInputChange('service_availed', e.target.value)} 
-                            className={`w-full px-4 py-2.5 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#FF9501] transition-colors cursor-pointer ${isInvalid('service_availed') ? 'border border-red-400 bg-red-50 text-red-700' : 'border border-[#E5E7EB] bg-[#F9FAFB]'}`}>
+                            className={`w-full px-4 py-2.5 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#FF9501] transition-colors cursor-pointer ${isInvalid('service_availed') ? 'border border-red-400 bg-red-50 text-red-700' : 'border border-[#E5E7EB] bg-white'}`}>
                       <option value="" disabled>Select Service...</option>
                       {SURVEY_CONFIG.services.map(s => <option key={s} value={s}>{s}</option>)}
                     </select>
@@ -420,21 +424,22 @@ export default function App() {
                   </div>
                 </div>
 
-                <div className={`p-5 rounded-xl border space-y-5 transition-colors duration-300 ${isInvalid('campus') || isInvalid('office_visited') || isInvalid('office_other') ? 'bg-red-50/50 border-red-200' : 'bg-[#F9FAFB] border-[#E5E7EB]'}`}>
-                  <div>
+                {/* Campus + Office Visited */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                  <div className={`p-5 rounded-xl border transition-colors duration-300 ${isInvalid('campus') ? 'bg-red-50/50 border-red-200' : 'bg-[#F9FAFB] border-[#E5E7EB]'}`}>
                     <label className={`block font-bold mb-2 text-sm ${isInvalid('campus') ? 'text-red-600' : 'text-[#374151]'}`}>Campus <span className="text-red-500">*</span></label>
                     <div className="flex gap-3">
                       {["Argao", "Oslob", "Ginatilan"].map(opt => (
                         <button 
                           key={opt} onClick={() => handleInputChange('campus', opt)}
-                          className={`flex-1 py-2 rounded-lg border text-sm font-medium transition-all ${formData.campus === opt ? 'border-[#FF9501] bg-[#FFF4E5] text-[#D97E00]' : isInvalid('campus') ? 'border-red-300 bg-white text-red-600' : 'border-[#E5E7EB] bg-white text-[#4B5563] hover:bg-gray-50'}`}
+                          className={`flex-1 py-2 rounded-lg border text-sm font-medium transition-all ${formData.campus === opt ? 'border-[#FF9501] bg-white text-[#D97E00]' : isInvalid('campus') ? 'border-red-300 bg-white text-red-600' : 'border-[#E5E7EB] bg-white text-[#4B5563] hover:border-gray-300'}`}
                         >
                           {opt}
                         </button>
                       ))}
                     </div>
                   </div>
-                  <div>
+                  <div className={`p-5 rounded-xl border transition-colors duration-300 ${isInvalid('office_visited') || isInvalid('office_other') ? 'bg-red-50/50 border-red-200' : 'bg-[#F9FAFB] border-[#E5E7EB]'}`}>
                     <label className={`block font-bold mb-2 text-sm ${isInvalid('office_visited') || isInvalid('office_other') ? 'text-red-600' : 'text-[#374151]'}`}>Office Visited <span className="text-red-500">*</span></label>
                     <select value={formData.office_visited} onChange={(e) => handleInputChange('office_visited', e.target.value)} 
                             className={`w-full px-4 py-2.5 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#FF9501] transition-colors cursor-pointer ${isInvalid('office_visited') ? 'border border-red-400 bg-white text-red-700' : 'border border-[#E5E7EB] bg-white'}`}>
@@ -569,14 +574,14 @@ export default function App() {
                   <h3 className="text-lg font-bold text-[#1F2937]">Part VI: Suggestions & Recommendations</h3>
                 </div>
 
-                <div>
-                  <label className="block font-bold text-[#374151] mb-2 text-sm">
+                <div className="p-5 bg-[#F9FAFB] rounded-xl border border-[#E5E7EB]">
+                  <label className="block font-bold text-[#374151] mb-3 text-sm">
                     We value your feedback. Please share any suggestions, comments, or recommendations.
                   </label>
                   <textarea 
                     rows="5" placeholder="Type your suggestions here..."
                     value={formData.suggestions} onChange={(e) => handleInputChange('suggestions', e.target.value)}
-                    className="w-full p-4 bg-[#F9FAFB] border border-[#E5E7EB] rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#FF9501] transition-colors resize-none"
+                    className="w-full p-4 bg-white border border-[#E5E7EB] rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#FF9501] transition-colors resize-none"
                   ></textarea>
                 </div>
 
