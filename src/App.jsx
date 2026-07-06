@@ -286,7 +286,7 @@ export default function App() {
                     <p className="mb-2"><strong>Contact Information:</strong> If you have any questions about this survey, your rights as a participant, or how your information will be used, please contact:</p>
                     <ul className="space-y-1">
                       <li><strong>Facebook:</strong> <a className="text-[#FF9501] hover:underline font-medium" href="https://www.facebook.com/profile.php?id=100063694579890" target="_blank" rel="noreferrer">Cebu Technological University - Argao Campus</a></li>
-                      <li><strong>Email:</strong> <a className="text-[#FF9501] hover:underline font-medium" href="mailto:argao@ctu.edu.ph">argao@ctu.edu.ph</a></li>
+                      <li><strong>Email:</strong> <a className="text-[#FF9501] hover:underline font-medium" href="mailto:cdargao@ctu.edu.ph">argao@ctu.edu.ph</a></li>
                     </ul>
                   </div>
                 </div>
