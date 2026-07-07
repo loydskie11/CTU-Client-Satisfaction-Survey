@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Analytics } from "@vercel/analytics/react"
 import { createClient } from '@supabase/supabase-js';
 import { 
   ChevronRight, ChevronLeft, CheckCircle, AlertCircle, 
