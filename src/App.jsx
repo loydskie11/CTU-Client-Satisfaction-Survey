@@ -79,6 +79,7 @@ export default function App() {
   const [error, setError] = useState("");
   
   const [invalidFields, setInvalidFields] = useState([]);
+  const [fieldErrors, setFieldErrors] = useState({});
 
   const [formData, setFormData] = useState({
     consent: "", client_type: "", date_of_service: "", gender: "", age: "", region: "", service_availed: "", service_other: "", campus: "", office_visited: "", office_other: "",
@@ -94,6 +95,13 @@ export default function App() {
     if (invalidFields.includes(field)) {
       setInvalidFields(prev => prev.filter(f => f !== field));
     }
+    if (fieldErrors[field]) {
+      setFieldErrors(prev => {
+        const nextErrs = { ...prev };
+        delete nextErrs[field];
+        return nextErrs;
+      });
+    }
   };
 
   const nextStep = () => {
@@ -105,19 +113,56 @@ export default function App() {
 
     if (step === 2) {
       const required = ['client_type', 'date_of_service', 'gender', 'age', 'region', 'service_availed', 'campus', 'office_visited'];
-      const missing = required.filter(field => !formData[field]);
+      const missing = required.filter(field => !formData[field] || formData[field].toString().trim() === '');
+      const newFieldErrors = {};
+
+      // Age validation
+      if (!formData.age && formData.age !== 0) {
+        newFieldErrors.age = "Age is required";
+      } else {
+        const ageNum = Number(formData.age);
+        if (isNaN(ageNum) || !Number.isInteger(ageNum)) {
+          missing.push('age');
+          newFieldErrors.age = "Age must be a valid whole number";
+        } else if (ageNum < 10 || ageNum > 120) {
+          missing.push('age');
+          newFieldErrors.age = "Age must be a realistic number between 10 and 120";
+        }
+      }
+
+      // Date of Service validation
+      if (!formData.date_of_service) {
+        newFieldErrors.date_of_service = "Date of service is required";
+      } else {
+        const selectedDate = new Date(formData.date_of_service);
+        const today = new Date();
+        today.setHours(23, 59, 59, 999);
+        if (isNaN(selectedDate.getTime())) {
+          missing.push('date_of_service');
+          newFieldErrors.date_of_service = "Please enter a valid date";
+        } else if (selectedDate > today) {
+          missing.push('date_of_service');
+          newFieldErrors.date_of_service = "Date of service cannot be in the future";
+        } else if (selectedDate.getFullYear() < 2020) {
+          missing.push('date_of_service');
+          newFieldErrors.date_of_service = "Please enter a date from 2020 onwards";
+        }
+      }
       
       if (formData.office_visited === "Other" && !formData.office_other.trim()) {
         missing.push('office_other');
+        newFieldErrors.office_other = "Please specify the office visited";
       }
       
       if (formData.service_availed === "Other" && !formData.service_other.trim()) {
         missing.push('service_other');
+        newFieldErrors.service_other = "Please specify the service availed";
       }
 
       if (missing.length > 0) {
-        setError("Please fill out all required fields highlighted in red.");
-        setInvalidFields(missing);
+        setError("Please correct the highlighted fields before proceeding.");
+        setInvalidFields(Array.from(new Set(missing)));
+        setFieldErrors(newFieldErrors);
         return;
       }
     }
@@ -143,6 +188,7 @@ export default function App() {
 
     setError("");
     setInvalidFields([]);
+    setFieldErrors({});
     setStep(prev => prev + 1);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -151,10 +197,44 @@ export default function App() {
     setStep(prev => prev - 1);
     setError("");
     setInvalidFields([]);
+    setFieldErrors({});
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+  const validateFeedbackStep = () => {
+    const invalid = [];
+    const errs = {};
+
+    if (formData.email && formData.email.trim() !== "") {
+      const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailPattern.test(formData.email.trim())) {
+        invalid.push('email');
+        errs.email = "Please enter a valid email address (e.g. name@example.com) or leave blank";
+      }
+    }
+
+    if (formData.full_name && formData.full_name.trim() !== "") {
+      if (formData.full_name.trim().length < 2) {
+        invalid.push('full_name');
+        errs.full_name = "Name must be at least 2 characters";
+      } else if (formData.full_name.length > 100) {
+        invalid.push('full_name');
+        errs.full_name = "Name cannot exceed 100 characters";
+      }
+    }
+
+    return { invalid, errs };
+  };
+
   const handleSubmit = async () => {
+    const { invalid, errs } = validateFeedbackStep();
+    if (invalid.length > 0) {
+      setError("Please fix the errors in your contact information before submitting.");
+      setInvalidFields(invalid);
+      setFieldErrors(errs);
+      return;
+    }
+
     if (!supabaseUrl || !supabaseAnonKey) {
       setError("Supabase connection keys are missing! Please check your .env file.");
       return;
@@ -162,6 +242,7 @@ export default function App() {
 
     setIsSubmitting(true);
     setError("");
+    setFieldErrors({});
     
     const payload = { ...formData };
     delete payload.consent; 
@@ -373,13 +454,23 @@ export default function App() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                   <div className={`p-5 rounded-xl border transition-colors duration-300 ${isInvalid('date_of_service') ? 'bg-red-50/50 border-red-200' : 'bg-[#F9FAFB] border-[#E5E7EB]'}`}>
                     <label className={`block font-bold mb-2 text-sm ${isInvalid('date_of_service') ? 'text-red-600' : 'text-[#374151]'}`}>Date of Service <span className="text-red-500">*</span></label>
-                    <input type="date" value={formData.date_of_service} onChange={(e) => handleInputChange('date_of_service', e.target.value)} 
+                    <input type="date" max={new Date().toISOString().split('T')[0]} value={formData.date_of_service} onChange={(e) => handleInputChange('date_of_service', e.target.value)} 
                            className={`w-full px-4 py-2.5 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#FF9501] transition-colors ${isInvalid('date_of_service') ? 'border border-red-400 bg-red-50 focus:border-[#FF9501]' : 'border border-[#E5E7EB] bg-white'}`} />
+                    {fieldErrors.date_of_service && (
+                      <p className="text-red-600 text-xs mt-1.5 font-medium flex items-center gap-1 animate-in fade-in">
+                        <AlertCircle className="w-3.5 h-3.5 shrink-0" /> {fieldErrors.date_of_service}
+                      </p>
+                    )}
                   </div>
                   <div className={`p-5 rounded-xl border transition-colors duration-300 ${isInvalid('age') ? 'bg-red-50/50 border-red-200' : 'bg-[#F9FAFB] border-[#E5E7EB]'}`}>
                     <label className={`block font-bold mb-2 text-sm ${isInvalid('age') ? 'text-red-600' : 'text-[#374151]'}`}>Age <span className="text-red-500">*</span></label>
-                    <input type="number" placeholder="Enter age" value={formData.age} onChange={(e) => handleInputChange('age', e.target.value)} 
+                    <input type="number" min="10" max="120" placeholder="Enter age (10-120)" value={formData.age} onChange={(e) => handleInputChange('age', e.target.value)} 
                            className={`w-full px-4 py-2.5 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#FF9501] transition-colors ${isInvalid('age') ? 'border border-red-400 bg-red-50 focus:border-[#FF9501]' : 'border border-[#E5E7EB] bg-white'}`} />
+                    {fieldErrors.age && (
+                      <p className="text-red-600 text-xs mt-1.5 font-medium flex items-center gap-1 animate-in fade-in">
+                        <AlertCircle className="w-3.5 h-3.5 shrink-0" /> {fieldErrors.age}
+                      </p>
+                    )}
                   </div>
                 </div>
 
@@ -416,11 +507,18 @@ export default function App() {
                       {SURVEY_CONFIG.services.map(s => <option key={s} value={s}>{s}</option>)}
                     </select>
                     {formData.service_availed === "Other" && (
-                      <input 
-                        type="text" placeholder="Please specify service..." 
-                        value={formData.service_other} onChange={(e) => handleInputChange('service_other', e.target.value)} 
-                        className={`mt-3 w-full px-4 py-2.5 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#FF9501] transition-colors animate-in fade-in ${isInvalid('service_other') ? 'border border-red-400 bg-red-50' : 'border border-[#E5E7EB] bg-white'}`}
-                      />
+                      <div>
+                        <input 
+                          type="text" placeholder="Please specify service..." 
+                          value={formData.service_other} onChange={(e) => handleInputChange('service_other', e.target.value)} 
+                          className={`mt-3 w-full px-4 py-2.5 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#FF9501] transition-colors animate-in fade-in ${isInvalid('service_other') ? 'border border-red-400 bg-red-50' : 'border border-[#E5E7EB] bg-white'}`}
+                        />
+                        {fieldErrors.service_other && (
+                          <p className="text-red-600 text-xs mt-1.5 font-medium flex items-center gap-1 animate-in fade-in">
+                            <AlertCircle className="w-3.5 h-3.5 shrink-0" /> {fieldErrors.service_other}
+                          </p>
+                        )}
+                      </div>
                     )}
                   </div>
                 </div>
@@ -448,11 +546,18 @@ export default function App() {
                       {SURVEY_CONFIG.offices.map(o => <option key={o} value={o}>{o}</option>)}
                     </select>
                     {formData.office_visited === "Other" && (
-                      <input 
-                        type="text" placeholder="Please specify office..." 
-                        value={formData.office_other} onChange={(e) => handleInputChange('office_other', e.target.value)} 
-                        className={`mt-3 w-full px-4 py-2.5 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#FF9501] transition-colors animate-in fade-in ${isInvalid('office_other') ? 'border border-red-400 bg-red-50' : 'border border-[#E5E7EB] bg-white'}`}
-                      />
+                      <div>
+                        <input 
+                          type="text" placeholder="Please specify office..." 
+                          value={formData.office_other} onChange={(e) => handleInputChange('office_other', e.target.value)} 
+                          className={`mt-3 w-full px-4 py-2.5 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#FF9501] transition-colors animate-in fade-in ${isInvalid('office_other') ? 'border border-red-400 bg-red-50' : 'border border-[#E5E7EB] bg-white'}`}
+                        />
+                        {fieldErrors.office_other && (
+                          <p className="text-red-600 text-xs mt-1.5 font-medium flex items-center gap-1 animate-in fade-in">
+                            <AlertCircle className="w-3.5 h-3.5 shrink-0" /> {fieldErrors.office_other}
+                          </p>
+                        )}
+                      </div>
                     )}
                   </div>
                 </div>
@@ -576,11 +681,18 @@ export default function App() {
                 </div>
 
                 <div className="p-5 bg-[#F9FAFB] rounded-xl border border-[#E5E7EB]">
-                  <label className="block font-bold text-[#374151] mb-3 text-sm">
-                    We value your feedback. Please share any suggestions, comments, or recommendations.
-                  </label>
+                  <div className="flex justify-between items-center mb-3">
+                    <label className="block font-bold text-[#374151] text-sm">
+                      We value your feedback. Please share any suggestions, comments, or recommendations.
+                    </label>
+                    <span className={`text-xs ${formData.suggestions.length > 900 ? 'text-red-500 font-bold' : 'text-gray-400'}`}>
+                      {formData.suggestions.length}/1000
+                    </span>
+                  </div>
                   <textarea 
-                    rows="5" placeholder="Type your suggestions here..."
+                    rows="5" 
+                    maxLength={1000}
+                    placeholder="Type your suggestions here..."
                     value={formData.suggestions} onChange={(e) => handleInputChange('suggestions', e.target.value)}
                     className="w-full p-4 bg-white border border-[#E5E7EB] rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#FF9501] transition-colors resize-none"
                   ></textarea>
@@ -590,12 +702,38 @@ export default function App() {
                   <p className="text-xs font-bold text-[#6B7280] mb-4 uppercase tracking-wider">Optional Contact Info</p>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                     <div>
-                      <label className="block font-medium text-[#374151] mb-1.5 text-sm">Complete Name</label>
-                      <input type="text" placeholder="Optional" value={formData.full_name} onChange={(e) => handleInputChange('full_name', e.target.value)} className="w-full px-4 py-2.5 bg-white border border-[#E5E7EB] rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#FF9501] transition-colors" />
+                      <label className={`block font-medium mb-1.5 text-sm ${isInvalid('full_name') ? 'text-red-600 font-semibold' : 'text-[#374151]'}`}>
+                        Complete Name <span className="text-xs text-[#9CA3AF] font-normal">(Optional)</span>
+                      </label>
+                      <input 
+                        type="text" 
+                        placeholder="e.g. Juan Dela Cruz" 
+                        value={formData.full_name} 
+                        onChange={(e) => handleInputChange('full_name', e.target.value)} 
+                        className={`w-full px-4 py-2.5 bg-white border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#FF9501] transition-colors ${isInvalid('full_name') ? 'border-red-400 bg-red-50 focus:border-[#FF9501]' : 'border-[#E5E7EB]'}`} 
+                      />
+                      {fieldErrors.full_name && (
+                        <p className="text-red-600 text-xs mt-1.5 font-medium flex items-center gap-1 animate-in fade-in">
+                          <AlertCircle className="w-3.5 h-3.5 shrink-0" /> {fieldErrors.full_name}
+                        </p>
+                      )}
                     </div>
                     <div>
-                      <label className="block font-medium text-[#374151] mb-1.5 text-sm">Email Address</label>
-                      <input type="email" placeholder="Optional" value={formData.email} onChange={(e) => handleInputChange('email', e.target.value)} className="w-full px-4 py-2.5 bg-white border border-[#E5E7EB] rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#FF9501] transition-colors" />
+                      <label className={`block font-medium mb-1.5 text-sm ${isInvalid('email') ? 'text-red-600 font-semibold' : 'text-[#374151]'}`}>
+                        Email Address <span className="text-xs text-[#9CA3AF] font-normal">(Optional)</span>
+                      </label>
+                      <input 
+                        type="email" 
+                        placeholder="e.g. user@example.com" 
+                        value={formData.email} 
+                        onChange={(e) => handleInputChange('email', e.target.value)} 
+                        className={`w-full px-4 py-2.5 bg-white border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#FF9501] transition-colors ${isInvalid('email') ? 'border-red-400 bg-red-50 focus:border-[#FF9501]' : 'border-[#E5E7EB]'}`} 
+                      />
+                      {fieldErrors.email && (
+                        <p className="text-red-600 text-xs mt-1.5 font-medium flex items-center gap-1 animate-in fade-in">
+                          <AlertCircle className="w-3.5 h-3.5 shrink-0" /> {fieldErrors.email}
+                        </p>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -643,7 +781,7 @@ export default function App() {
         </div>
         
         <div className="text-center mt-6 text-xs text-[#9CA3AF] font-medium">
-          Powered by CTU Argao Quality Assurance Office &copy; {currentYear}
+          Powered by CTU Argao Quality Assurance & Knowledge System © {new Date().getFullYear()}
         </div>
 
       </div>

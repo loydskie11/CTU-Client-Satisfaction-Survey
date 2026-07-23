@@ -1,0 +1,27 @@
+====================================================================
+CTU SURVEY APP - COLOR PALETTE & DESIGN SYSTEM
+====================================================================
+
+--- 1. PRIMARY BRAND PALETTE (CTU ORANGE THEME) ---
+#FF9501 : Primary CTU Orange (Active steps, primary buttons, progress bar, key icons, active highlights)
+#D97E00 : Dark CTU Orange (Primary button hover states, active text)
+#FFF4E5 : Soft Orange Tint (Badge background, active selected option background)
+
+--- 2. NEUTRAL & TYPOGRAPHY COLORS ---
+#1F2937 : Dark Gray / Off-Black (Main headings h1, h2, h3, prominent dark text)
+#374151 : Charcoal Gray (Form labels, primary body text)
+#4B5563 : Medium Dark Gray (Descriptions, back button text, instruction text)
+#6B7280 : Muted Gray (Subtitles, helper captions)
+#9CA3AF : Light Muted Gray (Inactive step numbers, footer copyright text)
+
+--- 3. BACKGROUND & BORDER COLORS ---
+#F5F7FA : Page Background (Main overall body canvas background)
+#F9FAFB : Section Container Background (Card subsections, footer action bars)
+#E5E7EB : Light Gray Border (Card borders, dividers, line breaks, inactive borders)
+#FFFFFF : Pure White (Card containers, active option cards)
+
+--- 4. BRAND ACCENT & SVG COLORS ---
+#863BFF : Primary Purple Accent (Favicon & SVG graphics)
+#7E14FF : Deep Purple Accent (Favicon & SVG graphic gradients)
+#47BFFF : Sky Blue Accent (Favicon & SVG graphic highlights)
+#08060D : Deep Dark Navy (Vector paths & icons)
